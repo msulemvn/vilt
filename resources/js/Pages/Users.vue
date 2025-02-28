@@ -37,7 +37,7 @@ const deleteRecord = (data) => {
         url: `/users/${data.id}`,
         responseType: "json",
     }).then(function (response) {
-        if (response.data.status === "OK") {
+        if (response.status === 204) {
             users.value = users.value.filter((user) => user.id !== data.id);
         }
     });

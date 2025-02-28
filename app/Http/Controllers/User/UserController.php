@@ -94,7 +94,7 @@ class UserController extends Controller
             $user->delete();
 
             return response()->json(["status"=>myResponse::$statusTexts[myResponse::HTTP_NO_CONTENT], "message"=>"User deleted successfully"], myResponse::HTTP_NO_CONTENT);
-        } catch (\Exception $e) {
+        } catch (ModelNotFoundException $e) {
             return response()->json(["status"=>myResponse::$statusTexts[myResponse::HTTP_NOT_FOUND], "message"=>"No query results for model"], myResponse::HTTP_NOT_FOUND);
         }
     }

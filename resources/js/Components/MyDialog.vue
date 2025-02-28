@@ -10,7 +10,7 @@ import {
     DialogTrigger,
 } from "@/Components/ui/dialog";
 import { Input } from "@/Components/ui/input";
-import { Label } from "@/Components/ui/label";  
+import { Label } from "@/Components/ui/label";
 import { toTypedSchema } from "@vee-validate/zod";
 import { useForm } from "vee-validate";
 import { h, ref, defineEmits, onMounted, watch } from "vue";
@@ -28,19 +28,19 @@ const props = defineProps({
     },
     isDialogOpen: {
         type: Boolean,
-    }
+    },
 });
 
-const emit = defineEmits(['onCreate', 'onEdit', 'onDialogClose']);
+const emit = defineEmits(["onCreate", "onEdit", "onDialogClose"]);
 
 const user = ref(props.user);
 const isDialogOpen = ref(props.isDialogOpen);
 
-onMounted(()=>{});
+onMounted(() => {});
 
-watch(isDialogOpen, (current, previous)=>{
-    if(current != previous) {
-        emit('onDialogClose', current);
+watch(isDialogOpen, (current, previous) => {
+    if (current != previous) {
+        emit("onDialogClose", current);
     }
 });
 
@@ -69,7 +69,11 @@ const onSubmitForm = (event: SubmitEvent) => {
         data: Object.fromEntries(formData),
         responseType: "json",
     }).then(function (response) {
-        props.operation == "Create" ? emit('onCreate', response.data.data) : emit('onEdit', response.data.data);
+        if (response.status === 201) {
+            emit("onCreate", response.data.data)
+        } else {
+            emit("onEdit", response.data.data)
+        }
         isDialogOpen.value = false;
     });
 };
