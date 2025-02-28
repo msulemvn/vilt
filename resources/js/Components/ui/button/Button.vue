@@ -13,7 +13,7 @@ const props = defineProps({
 </script>
 
 <template>
-  <Primitive
+  <Primitive class="hover:bg-accent"
     :as="as"
     :as-child="asChild"
     :class="cn(buttonVariants({ variant, size }), props.class)"

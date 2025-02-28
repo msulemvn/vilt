@@ -33,8 +33,23 @@ const showingNavigationDropdown = ref(false);
                                     Dashboard
                                 </NavLink>
                                 <NavLink :href="route('me')">
-                                    Me
+                                    Bio
                                 </NavLink>
+                                <NavLink :href="route('users')">
+                                    Users
+                                </NavLink>
+                                <!-- <NavLink :href="route('posts')">
+                                    Posts
+                                </NavLink>
+                                <NavLink :href="route('tags')">
+                                    Tags
+                                </NavLink>
+                                <NavLink :href="route('articles')">
+                                    Articles
+                                </NavLink>
+                                <NavLink :href="route('videos')">
+                                    Videos
+                                </NavLink> -->
                             </div>
                         </div>
 
@@ -118,9 +133,24 @@ const showingNavigationDropdown = ref(false);
                         <ResponsiveNavLink :href="route('dashboard')" :active="route().current('dashboard')">
                             Dashboard
                         </ResponsiveNavLink>
-                        <ResponsiveNavLink :href="route('dashboard')">
-                            Me
+                        <ResponsiveNavLink :href="route('me')">
+                            Bio
                         </ResponsiveNavLink>
+                        <ResponsiveNavLink :href="route('users')">
+                            Users
+                        </ResponsiveNavLink>
+                        <!-- <ResponsiveNavLink :href="route('posts')">
+                            Posts
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink :href="route('tags')">
+                            Tags
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink :href="route('articles')">
+                            Articles
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink :href="route('videos')">
+                            Videos
+                        </ResponsiveNavLink> -->
                     </div>
 
                     <!-- Responsive Settings Options -->

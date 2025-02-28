@@ -46,10 +46,10 @@ php artisan db:seed
 ```
 ---
 
-## 3. Shadcn
+## Shadcn
 <https://www.shadcn-vue.com/docs/installation/laravel.html>
 
-## 4. Tailwind CSS
+## Tailwind CSS
 <https://www.shadcn-vue.com/docs/installation/vite>
 
 To set up the front-end, run the following commands:
@@ -57,6 +57,76 @@ To set up the front-end, run the following commands:
 npm install
 npm run dev
 ```
+
+## Font Awesome
+
+<https://docs.fontawesome.com/web/use-with/vue>
+
+### Install
+```sh
+npm i --save @fortawesome/vue-fontawesome@latest-3
+npm i --save @fortawesome/fontawesome-svg-core
+npm i --save @fortawesome/free-solid-svg-icons
+npm i --save @fortawesome/free-regular-svg-icons
+npm i --save @fortawesome/free-brands-svg-icons
+```
+
+### Add in app.js
+
+```js
+import './bootstrap';
+import { createApp } from 'vue'
+import App from './App.vue'
+import './assets/main.css'
+import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
+import {library} from "@fortawesome/fontawesome-svg-core";
+import {fas} from "@fortawesome/free-solid-svg-icons";
+
+const app = createApp(App)
+app.component("FontAwesomeIcon", FontAwesomeIcon)
+app.mount('#app')
+```
+
+### Add icon
+
+```vue
+// import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+
+<script>
+function scrollToTop() {
+    window.scrollTo({top: 0, behavior: 'smooth'});
+    // window.scrollIntoView({ behavior: 'smooth' })    
+    // window.scrollTo(0,0);
+}
+</script>
+<template>    
+    <a href="#" @click="scrollToTop"><div class="scrolltop">
+        <FontAwesomeIcon icon="chevron-up" />
+    </div></a>
+</template>
+<style>
+html {
+    scroll-behavior: smooth;
+}
+
+.scrolltop {
+    color: #fff;
+    background: #0099ff;
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    padding: 15px;    
+}
+</style>
+```
+
+---
+
+## Axios
+```
+npm install --save axios vue-axios
+```
+<https://www.npmjs.com/package/vue-axios>
 
 
 ---
