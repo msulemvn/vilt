@@ -3,77 +3,72 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { Head } from "@inertiajs/vue3";
 import { Button } from "@/Components/ui/button";
 import MyTable from "@/Components/MyTable.vue";
-import { ref, reactive, toRaw } from "vue";
+import { ref, watch} from "vue";
 import MyDialog from "@/Components/MyDialog.vue";
-import _ from "lodash";
-import { router } from '@inertiajs/vue3'
 
-const buttonLabel = ref("Create");
+let operation = ref("Create");
+let isDialogOpen = ref(false);
+
 const props = defineProps({
     users: {
-        type: Object,
+        type: Array,
     },
 });
 
-let users = reactive(props.users.data);
+const users = ref(props.users.data);
+const user = ref({});
 
-function handleOnCreate(data) {
-    const nextId = users.length > 0 
-        ? Math.max(...users.map(user => user.id)) + 1 
-        : 1;
-
-    users.push({
-        ...data,
-        id: nextId
-    });
+function setDialog() {
+    isDialogOpen.value = false;
 }
 
-function handleOnEdit(data) {
-    const index = users.findIndex(user => user.id === data.id);
-    
-    if (index !== -1) {
-        users[index] = {
-            ...users[index],
-            ...data
-        };
-    } else {
-        console.error('User not found!');
-    }
+function createRecord(data) {
+    users.value.push(data);
 }
 
-const edit = (row) => {
-    buttonLabel.value = "Edit";
-};
-const add = () => {
-    buttonLabel.value = "Create";
-};
-
-function removeAndReindex(users, indexToRemove) {
-    delete users[indexToRemove];
-    //reindexing
-    users = Object.values(users);
-    console.log(JSON.stringify(users));
-    return users;
+function editRecord(data) {
+    let user = users.value.find((user) => user.id === data.id);
+    Object.assign(user, data);
 }
 
-const deleteRow = (rowIndex, user) => {
+const deleteRecord = (data) => {
     axios({
         method: "delete",
-        url: `/users/${user.id}`,
+        url: `/users/${data.id}`,
         responseType: "json",
     }).then(function (response) {
         if (response.data.status === "OK") {
-            router.visit('/users', {preserveScroll: true});
-            // users = { ... removeAndReindex(users, rowIndex) };
+            users.value = users.value.filter((user) => user.id !== data.id);
         }
     });
+};
+
+const handleEditClick = (data) => {
+    operation = "Edit";
+    isDialogOpen.value = true;
+    user.value = data;
+};
+
+const handleCreateClick = () => {
+    operation = 'Create'
+    isDialogOpen.value = true;
+    user.value = {}
 };
 
 </script>
 
 <template>
     <Head title="Users" />
-
+    <MyDialog
+        v-if="isDialogOpen"
+        :operation="operation"
+        :isDialogOpen="isDialogOpen"
+        @onCreate="createRecord"
+        @onEdit="editRecord"
+        @onDialogClose="setDialog"
+        :user="user"
+    >
+    </MyDialog>
     <AuthenticatedLayout>
         <template #header>
             <h2
@@ -92,25 +87,17 @@ const deleteRow = (rowIndex, user) => {
                 <div
                     class="dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg mb-2"
                 >
-                    <MyDialog :buttonLabel="buttonLabel" @onCreate="handleOnCreate" @onEdit="handleOnEdit">
-                        <template #trigger>
-                            <Button
-                                class="float-right"
-                                @click="add"
-                                variant="outline"
-                            >
-                                <FontAwesomeIcon icon="user" class="pr-2" /> Add
-                                User
-                            </Button>
-                        </template>
-                    </MyDialog>
+                    <Button
+                        class="float-right"
+                        @click="handleCreateClick"
+                        variant="outline"
+                    >
+                        <FontAwesomeIcon icon="user" class="pr-2" /> Add User
+                    </Button>
                 </div>
                 <MyTable :users="users">
                     <template #rowData>
-                        <tr
-                            v-for="(row, rowIndex) in users"
-                            :key="rowIndex"
-                        >
+                        <tr v-for="(row, rowIndex) in users" :key="rowIndex">
                             <td
                                 v-for="(cell, cellIndex) in row"
                                 class="px-4 py-2"
@@ -118,26 +105,18 @@ const deleteRow = (rowIndex, user) => {
                                 {{ cell }}
                             </td>
                             <td class="px-4 py-2">
-                                <MyDialog
-                                    :user="row"
-                                    :buttonLabel="buttonLabel"
-                                    @onCreate="handleOnCreate" @onEdit="handleOnEdit"
-                                >
-                                    <template #trigger>
-                                        <Button
-                                            variant="outline"
-                                            @click="edit(row)"
-                                        >
-                                            <FontAwesomeIcon
-                                                icon="pencil"
-                                                class="pr-2"
-                                            />Edit
-                                        </Button>
-                                    </template>
-                                </MyDialog>
                                 <Button
                                     variant="outline"
-                                    @click="deleteRow(rowIndex, row)"
+                                    @click="handleEditClick(row)"
+                                >
+                                    <FontAwesomeIcon
+                                        icon="pencil"
+                                        class="pr-2"
+                                    />Edit
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    @click="deleteRecord(row)"
                                     class="ml-1"
                                 >
                                     <FontAwesomeIcon

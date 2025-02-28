@@ -13,10 +13,9 @@ import { Input } from "@/Components/ui/input";
 import { Label } from "@/Components/ui/label";  
 import { toTypedSchema } from "@vee-validate/zod";
 import { useForm } from "vee-validate";
-import { h, reactive, ref, defineEmits } from "vue";
+import { h, ref, defineEmits, onMounted, watch } from "vue";
 import * as z from "zod";
 import axios from "axios";
-import { router } from '@inertiajs/vue3'
 
 const props = defineProps({
     user: {
@@ -24,16 +23,26 @@ const props = defineProps({
         default: {},
         required: false,
     },
-    buttonLabel: {
+    operation: {
         type: String,
     },
+    isDialogOpen: {
+        type: Boolean,
+    }
 });
 
-const emit = defineEmits(['onCreate', 'onEdit']);
+const emit = defineEmits(['onCreate', 'onEdit', 'onDialogClose']);
 
-const user = reactive(Object.assign({}, props.user));
+const user = ref(props.user);
+const isDialogOpen = ref(props.isDialogOpen);
 
-const isDialogOpen = ref(false);
+onMounted(()=>{});
+
+watch(isDialogOpen, (current, previous)=>{
+    if(current != previous) {
+        emit('onDialogClose', current);
+    }
+});
 
 const formSchema = toTypedSchema(
     z.object({
@@ -49,33 +58,29 @@ const formSchema = toTypedSchema(
 
 const { handleSubmit, errors } = useForm({
     validationSchema: formSchema,
-    initialValues: user,
+    initialValues: user.value,
 });
 
 const onSubmitForm = (event: SubmitEvent) => {
     const formData = new FormData(event.target as HTMLFormElement);
     axios({
-        method: props.buttonLabel == "Create" ? "post" : "put",
-        url: `/users${props.buttonLabel == "Create" ? "" : "/" + user.id}`,
+        method: props.operation == "Create" ? "post" : "put",
+        url: `/users${props.operation == "Create" ? "" : "/" + user.value.id}`,
         data: Object.fromEntries(formData),
         responseType: "json",
     }).then(function (response) {
-        // props.buttonLabel == "Create" ? emit('onCreate', response.data.data) : emit('onEdit', response.data.data);
-        router.visit('/users', {preserveScroll: true});
+        props.operation == "Create" ? emit('onCreate', response.data.data) : emit('onEdit', response.data.data);
+        isDialogOpen.value = false;
     });
-    isDialogOpen.value = false;
 };
 </script>
 
 <template>
     <Dialog v-model:open="isDialogOpen">
-        <DialogTrigger as-child>
-            <slot name="trigger" />
-        </DialogTrigger>
         <DialogContent class="sm:max-w-[425px]">
             <form @submit.prevent="onSubmitForm">
                 <DialogHeader>
-                    <DialogTitle>{{ props.buttonLabel }}</DialogTitle>
+                    <DialogTitle>{{ props.operation }}</DialogTitle>
                     <DialogDescription>
                         Make changes to your profile here. Click save when
                         you're done.

@@ -1,8 +1,8 @@
 <script setup>
-import { defineProps, reactive } from "vue";
+import { defineProps, ref } from "vue";
 const props = defineProps({
     users: {
-        type: Object,
+        type: Array,
         required: true,
     },
     actions: {
@@ -12,10 +12,13 @@ const props = defineProps({
     },
 });
 
-const users = reactive(props.users);
-const columns = [...Object.keys(users[0]), "actions"].map((key) =>
-    _.startCase(_.toLower(key)),
-);
+const users = ref(props.users);
+const columns = users.value && users.value.length > 0 
+    ? [...Object.keys(users.value[0]), "actions"].map((key) =>
+        _.startCase(_.toLower(key))
+      )
+    : [""];
+
 </script>
 
 <template>
