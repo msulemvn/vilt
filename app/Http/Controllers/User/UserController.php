@@ -11,6 +11,7 @@ use App\Models\User;
 use App\Http\Resources\UserResource;
 use Symfony\Component\HttpFoundation\Response as myResponse;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class UserController extends Controller
 {
@@ -21,7 +22,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = User::where("id", "!=", Auth::id())->withoutTrashed()->get();
+        $users = User::where("id", "!=", Auth::id())->get();
         $users = UserResource::collection($users);
         return Inertia::render("Users", compact("users"));
     }
@@ -38,9 +39,9 @@ class UserController extends Controller
 
             $userData = ["name"=>$request->name, "email"=>$request->email, "password"=>Hash::make("password")];
             $user = User::create($userData);
-            return response()->json(["status"=>myResponse::$statusTexts[myResponse::HTTP_OK], "message"=>"User created successfully", "data"=>new UserResource($user)]);
+
+            return response()->json(["status"=>myResponse::$statusTexts[myResponse::HTTP_CREATED], "message"=>"User created successfully", "data"=>new UserResource($user)], myResponse::HTTP_CREATED);
         } catch (\Exception $e) {
-            // return response()->json(["response"=>$e->getMessage()]);
             return response()->json(["message"=>myResponse::$statusTexts[myResponse::HTTP_INTERNAL_SERVER_ERROR]]);
         }
     }
@@ -54,7 +55,6 @@ class UserController extends Controller
     public function show(string $id): Response
 
     {
-
         return Inertia::render("users/show", [
             "user" => User::findOrFail($id)
         ]);
@@ -76,8 +76,8 @@ class UserController extends Controller
             $user->update($userData);
 
             return response()->json(["status"=>myResponse::$statusTexts[myResponse::HTTP_OK], "message"=>"User updated successfully", "data"=>new UserResource($user)]);
-        } catch (\Exception $e) {
-            return response()->json(["message"=>myResponse::$statusTexts[myResponse::HTTP_INTERNAL_SERVER_ERROR]]);
+        } catch (ModelNotFoundException $e) {
+            return response()->json(["status"=>myResponse::$statusTexts[myResponse::HTTP_NOT_FOUND], "message"=>"No query results for model"], myResponse::HTTP_NOT_FOUND);
         }
     }
 
@@ -93,10 +93,9 @@ class UserController extends Controller
             $user = User::find($id);
             $user->delete();
 
-            return response()->json(["status"=>myResponse::$statusTexts[myResponse::HTTP_OK], "message"=>"User deleted successfully"]);
+            return response()->json(["status"=>myResponse::$statusTexts[myResponse::HTTP_NO_CONTENT], "message"=>"User deleted successfully"], myResponse::HTTP_NO_CONTENT);
         } catch (\Exception $e) {
-            // return response()->json(["response"=>$e->getMessage()]);
-            return response()->json(["message"=>myResponse::$statusTexts[myResponse::HTTP_INTERNAL_SERVER_ERROR]]);
+            return response()->json(["status"=>myResponse::$statusTexts[myResponse::HTTP_NOT_FOUND], "message"=>"No query results for model"], myResponse::HTTP_NOT_FOUND);
         }
     }
 }
