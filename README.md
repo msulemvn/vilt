@@ -184,7 +184,6 @@ pnpm add axios vue-axios
 ## Prettier
 
 ```bash
-pnpm init
 pnpm add -D prettier
 ```
 
