@@ -12,7 +12,7 @@
         "@vitejs/plugin-vue": "^5.0.0",
         "@vue/server-renderer": "^3.4.0",
         "autoprefixer": "^10.4.20",
-        "axios": "^1.6.4",
+        "axios": "^1.8.1",
         "laravel-vite-plugin": "^1.0.0",
         "postcss": "^8.4.31",
         "tailwindcss": "^3.4.17",
@@ -33,6 +33,7 @@
         "lucide-vue-next": "^0.477.0",
         "reka-ui": "^2.0.2",
         "tailwind-merge": "^3.0.2",
-        "tailwindcss-animate": "^1.0.7"
+        "tailwindcss-animate": "^1.0.7",
+        "vue-axios": "^3.5.2"
     }
 }
